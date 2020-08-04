@@ -25,6 +25,7 @@ unsigned int DigiShieldV4(const CBlockIndex* pindexLast, const Consensus::Params
 	// find first block in averaging interval
 	// Go back by what we want to be nAveragingInterval blocks per algo
 	const CBlockIndex* pindexFirst = pindexLast;
+    const arith_uint256 powLimit = UintToArith256(params.powLimit);
 	for (int i = 0; pindexFirst && i < params.nAveragingInterval; i++)
 	{
 		pindexFirst = pindexFirst->pprev;
@@ -33,7 +34,7 @@ unsigned int DigiShieldV4(const CBlockIndex* pindexLast, const Consensus::Params
 	const CBlockIndex* pindexPrev = pindexLast->pprev;
 	if (pindexPrev == nullptr || pindexFirst == nullptr)
 	{
-		return UintToArith256(params.powLimit).GetCompact();
+		return powLimit.GetCompact();
 	}
 
 	// Limit adjustment step
@@ -55,20 +56,14 @@ unsigned int DigiShieldV4(const CBlockIndex* pindexLast, const Consensus::Params
 
 	//Per-algo retarget
     //Previous code from dgb had pindexPrevAlgo->nHeight - pindexLast->nHeight ,we have it set to a constant of 1 as note has only one pow algo
-	int nAdjustments = 1;
-	if (nAdjustments > 0)
-	{
-		for (int i = 0; i < nAdjustments; i++)
-		{
-			bnNew *= 100;
-			bnNew /= (100 + params.nLocalTargetAdjustment);
-		}
-	}
+    //Also removed the forloop since we dont have more than 1 adjustment
+	bnNew *= 100;
+	bnNew /= (100 + params.nLocalTargetAdjustment);
     //Removed nadjustments < 0 as we dont have that case
 
-	if (bnNew > UintToArith256(params.powLimit))
+	if (bnNew > powLimit)
 	{
-		bnNew = UintToArith256(params.powLimit);
+		bnNew = powLimit;
 	}
 
 	return bnNew.GetCompact();
