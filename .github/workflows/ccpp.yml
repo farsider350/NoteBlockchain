@@ -72,7 +72,7 @@ jobs:
       working-directory: ${{ env.SOURCE_ARTIFACT }}
     - name: Build NoteCoin
       run: |
-        ./configure --prefix=$(realpath depends/x86_64-pc-linux-gnu)
+        ./configure
         make -j$(nproc)
       working-directory: ${{ env.SOURCE_ARTIFACT }}
     - name: Prepare Files for Artifact
@@ -113,7 +113,7 @@ jobs:
       working-directory: ${{ env.SOURCE_ARTIFACT }}
     - name: Build NoteCoin
       run: |
-        ./configure --prefix=$(realpath depends/x86_64-w64-mingw32)
+        ./configure --prefix=`pwd`/depends/i686-w64-mingw32
         make -j$(nproc)
       working-directory: ${{ env.SOURCE_ARTIFACT }}
     - name: Prepare Files for Artifact
